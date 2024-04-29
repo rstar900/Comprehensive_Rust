@@ -20,8 +20,13 @@ fn magnitude(v: &[f64]) -> f64 {
 
 
 fn normalize(v: &mut [f64]) {
-    for i in 0..3 {
-        v[i] /= magnitude(&v);
+
+    // calculate magnitude before to avoid borrow after move
+    let mag = magnitude(v); // Already a ref so no need of &
+    
+    for i in v {
+        // Each element is a &f64 so need to deref and assign
+        *i /= mag;
     }
 }
 
