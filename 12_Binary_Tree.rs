@@ -85,11 +85,14 @@ impl<T: Ord> Subtree<T> {
                 // Base case 2: If found return true
                 if *value == x.value {
                     true
+
+                 // Other cases: continue further down the tree, left Subtree or the right one as the tree is sorted!
+                 // If either of the Subtrees contains it, then we have found it   
+                } else if *value < x.value {
+                    x.left.has(value) 
                     
                 } else {
-                    // Other case: continue further down the tree, left Subtree and then the right one
-                    // If either of the Subtrees contains it, then we have found it
-                    x.left.has(value) || x.right.has(value)
+                    x.right.has(value)
                 }
             }
         };
