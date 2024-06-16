@@ -109,7 +109,7 @@ fn parse_field(data: &[u8]) -> (Field, &[u8]) {
     let (field_num, wire_type) = unpack_tag(tag);
     let (fieldvalue, remainder) = match wire_type {
     
-        // TODO: Based on the wire type, build a Field, consuming as many bytes as necessary
+        // Based on the wire type, build a Field, consuming as many bytes as necessary
         
         WireType::Varint => {
             let (varint_data, remainder) = parse_varint(remainder);
@@ -132,7 +132,7 @@ fn parse_field(data: &[u8]) -> (Field, &[u8]) {
         }
     };
     
-    // TODO: Return the field, and any un-consumed bytes
+    // Return the field, and any un-consumed bytes
     (Field{
         field_num: field_num,
         value: fieldvalue
@@ -166,17 +166,33 @@ struct Person<'a> {
     phone: Vec<PhoneNumber<'a>>,
 }
 
-// TODO: Implement ProtoMessage for Person and PhoneNumber
+// Implement ProtoMessage for Person and PhoneNumber
 
 impl<'a> ProtoMessage<'a> for Person<'a> {
     fn add_field(&mut self, field: Field<'a>){
-        // TODO
+        
+        match field.field_num {
+            1 => self.name = field.value.as_string(),
+            2 => self.id = field.value.as_u64(),
+            3 => {
+                // Extract the bytes and deserialize them into PhoneNumber struct
+                let phone_number: PhoneNumber = parse_message(field.value.as_bytes());
+                // Add the phone number to the vector 
+                self.phone.push(phone_number)
+            },
+            _ => ()
+        }
     }
 }
 
 impl<'a> ProtoMessage<'a> for PhoneNumber<'a> {
     fn add_field(&mut self, field: Field<'a>){
-        // TODO
+        
+        match field.field_num {
+            1 => self.number = field.value.as_string(),
+            2 => self.type_ = field.value.as_string(),
+            _ => ()
+        }
     }
 }
 
